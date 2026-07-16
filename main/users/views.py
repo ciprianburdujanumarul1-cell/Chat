@@ -90,12 +90,11 @@ def me(request):
         return JsonResponse({
             "user": {
                 "username": request.user.username,
-                "email": request.user.email
+                "email": request.user.email,
+                "is_staff": request.user.is_staff,
             }
         })
-
     return JsonResponse({"user": None})
-
 
 @ensure_csrf_cookie
 def csrf(request):

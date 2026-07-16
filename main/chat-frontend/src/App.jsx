@@ -1,24 +1,8 @@
+
 import { useState, createContext, useContext, useEffect } from "react";
-
-/* ------------------------------------------------------------------ */
-/*  Design tokens                                                      */
-/*  Subject: real-time chat app auth. Near-black canvas, one signal    */
-/*  color (teal — reads as "online"), typing-dots as the signature     */
-/*  motif tying the auth screen back to the product it unlocks.        */
-/* ------------------------------------------------------------------ */
-const fontImport = `@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500&display=swap');`;
-
-const tokens = {
-  bg: "#0B0E14",
-  panel: "#11151F",
-  card: "#161B27",
-  border: "#232838",
-  text: "#E7E9EE",
-  textMuted: "#7C8394",
-  accent: "#4FD8C4",
-  accentDim: "#2A6E63",
-  danger: "#E2685C",
-};
+import { tokens, fontImport } from "./theme";
+import SupportChat from "./SupportChat";
+import AdminSupportDashboard from "./AdminSupportDashboard";
 
 /* ------------------------------------------------------------------ */
 /*  API layer — talks to the Django endpoints                          */
@@ -506,29 +490,41 @@ function SignedInPanel() {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        justifyContent: "center",
+        padding: "40px 24px",
         fontFamily: "Inter, sans-serif",
-        gap: 16,
+        gap: 20,
       }}
     >
       <style>{fontImport}</style>
-      <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 20 }}>
-        Welcome, {user?.username}
-      </p>
-      <button
-        onClick={logout}
+      <div
         style={{
-          background: "none",
-          border: `1px solid ${tokens.border}`,
-          color: tokens.textMuted,
-          borderRadius: 8,
-          padding: "9px 18px",
-          cursor: "pointer",
-          fontSize: 13.5,
+          width: "100%",
+          maxWidth: 880,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
-        Log out
-      </button>
+        <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 18, color: tokens.text, margin: 0 }}>
+          {user?.username} {user?.is_staff && <span style={{ color: tokens.accent, fontSize: 13 }}>(admin)</span>}
+        </p>
+        <button
+          onClick={logout}
+          style={{
+            background: "none",
+            border: `1px solid ${tokens.border}`,
+            color: tokens.textMuted,
+            borderRadius: 8,
+            padding: "9px 18px",
+            cursor: "pointer",
+            fontSize: 13.5,
+          }}
+        >
+          Log out
+        </button>
+      </div>
+
+      {user?.is_staff ? <AdminSupportDashboard /> : <SupportChat />}
     </div>
   );
 }

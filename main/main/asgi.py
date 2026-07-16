@@ -1,14 +1,25 @@
-
 import os
 
-from channels.routing import ProtocolTypeRouter
+from channels.auth import AuthMiddlewareStack
+from channels.routing import ProtocolTypeRouter, URLRouter
+from channels.security.websocket import AllowedHostsOriginValidator
 from django.core.asgi import get_asgi_application
+from django.urls import re_path
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'main.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "main.settings")
 
-application = get_asgi_application()
+django_asgi_app = get_asgi_application()
 
-ASGI_APPLICATION = "main.asgi.application"
+from chat.consumers import AdminChatConsumer, PublicChatConsumer
+
 application = ProtocolTypeRouter({
-    "http": application,
+    "http": django_asgi_app,
+    "websocket": AllowedHostsOriginValidator(
+        AuthMiddlewareStack(
+            URLRouter([
+                re_path(r"^chat/admin/(?P<user_id>\d+)/$", AdminChatConsumer.as_asgi()),
+                re_path(r"^chat/$", PublicChatConsumer.as_asgi()),
+            ])
+        )
+    ),
 })
